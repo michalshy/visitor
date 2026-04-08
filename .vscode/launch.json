@@ -9,7 +9,7 @@
       "args": [],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
-      "externalConsole": true,
+      "externalConsole": false,
       "MIMode": "gdb",
       "preLaunchTask": "cmake build",
       "setupCommands": [
