@@ -18,6 +18,7 @@ namespace visitor
         App& operator=(const App&) = delete;
         App& operator=(App&&) = delete;
         
+        bool Initialize();
         void Run();
     };
 }

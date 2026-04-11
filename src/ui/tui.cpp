@@ -9,8 +9,30 @@ using namespace ftxui;
 
 namespace visitor
 {
+    bool Tui::Initialize() {
+        for(auto& pane: panes) {
+            if(!pane.Initialize())
+                return false;
+        }
+
+        return true;
+    }
+
     void Tui::Run() {
         auto screen = ScreenInteractive::Fullscreen();
-        screen.Loop(Renderer([] { return text("visitor - file manager") | center; }));
+
+        auto left = Menu({
+            .entries = panes[0].Names(),
+            .selected = panes[0].Index()
+        });
+
+        auto right = Menu({
+            .entries = panes[1].Names(),
+            .selected = panes[1].Index()
+        });
+
+        auto container = Container::Horizontal({ left, right });
+
+        screen.Loop(Renderer([&] { return hbox({ left->Render() | border, right->Render() | border }); }));
     }
 }
