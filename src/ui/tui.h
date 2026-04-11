@@ -3,14 +3,27 @@
 
 #include "pane.h"
 #include <array>
+#include <memory>
+
+namespace ftxui {
+    class ScreenInteractive;
+    class Event;
+}
 
 namespace visitor {
     class Tui {
-        std::array<Pane, 2> panes;
+        struct Impl;
+        std::unique_ptr<Impl> pimpl;
+        
     public:
-        Tui() : panes({ Pane(PaneKind::HOME), Pane(PaneKind::CURRENT) }) {}
+        Tui();
+        ~Tui();
         bool Initialize();
         void Run();
+    private:
+        bool HandleEvent(ftxui::Event);
+        void Quit();
+        void Switch();
     };
 }
 

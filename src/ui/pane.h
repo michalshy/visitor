@@ -23,11 +23,13 @@ namespace visitor
     public:
         explicit Pane(PaneKind kind);
 
+        std::filesystem::path Path() { return current; }
         std::vector<std::string>* Names() { return &entries_names; }
         int* Index() { return &index; };
 
         bool Initialize();
-        void Render();    
+
+        void Execute();
     };
 }
 

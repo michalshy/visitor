@@ -37,7 +37,7 @@ namespace visitor
         return true;
     }
 
-    void Pane::Render() {
+    void Pane::Execute() {
 
     }
 }
