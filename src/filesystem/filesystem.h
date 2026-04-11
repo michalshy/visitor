@@ -1,5 +1,0 @@
-#ifndef VISITOR_FILESYSTEM_H
-#define VISITOR_FILESYSTEM_H
-
-
-#endif

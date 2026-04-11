@@ -1,15 +1,13 @@
 #ifndef VISITOR_H
 #define VISITOR_H
 
-#include "core/core.h"
-#include "view/iview.h"
 #include <memory>
+#include "ui/tui.h"
 
 namespace visitor
 {
     class App {
-        std::unique_ptr<Core> core;
-        std::unique_ptr<interfaces::IView> view;
+        std::unique_ptr<Tui> tui;
     public:
         App();
 
