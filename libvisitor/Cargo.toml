@@ -1,0 +1,9 @@
+[package]
+name = "libvisitor"
+version = "0.1.0"
+
+[dependencies]
+
+[dev-dependencies]
+# only compiled when running tests
+tempfile = "3"    
