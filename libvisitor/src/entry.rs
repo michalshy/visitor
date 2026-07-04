@@ -2,13 +2,13 @@ use std::{fs::{self, DirEntry}, os::unix::fs::MetadataExt, path::PathBuf, time::
 
 pub struct VEntry
 {
-    name: String,
-    path: String,
-    kind: VKind,
-    size: u64,
-    modified: SystemTime,
-    permissions: VPermissions,
-    hidden: bool,
+    pub name: String,
+    pub path: String,
+    pub kind: VKind,
+    pub size: u64,
+    pub modified: SystemTime,
+    pub permissions: VPermissions,
+    pub hidden: bool,
 }
 
 impl VEntry {

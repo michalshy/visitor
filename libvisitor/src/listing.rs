@@ -2,11 +2,11 @@ use crate::VEntry;
 use crate::VError;
 
 use std::fs;
-use std::env;
+use std::path::Path;
 
-pub fn list_dir() -> Result<Vec<VEntry>, VError> {
+pub fn list_dir(path: &Path) -> Result<Vec<VEntry>, VError> {
     let mut entries: Vec<VEntry> = Vec::new();
-    let curr = fs::read_dir(env::current_dir().unwrap()).unwrap();
+    let curr = fs::read_dir(path).unwrap();
     for path in curr {
         match path {
             Ok(entry) => {
@@ -22,10 +22,16 @@ pub fn list_dir() -> Result<Vec<VEntry>, VError> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::VKind;
+    use std::fs::File;
+    use tempfile::tempdir;
 
     #[test]
-    fn test_entry_metadata() {
-
+    fn test_list_empty() {
+        let dir = tempdir().unwrap();
+        let entries = list_dir(dir.path()).unwrap();
+        assert!(entries.is_empty());
     }
 
 }
