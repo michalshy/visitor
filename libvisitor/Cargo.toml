@@ -3,9 +3,9 @@ name = "libvisitor"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
-anyhow = "1.0.103"
-
 [dev-dependencies]
 # only compiled when running tests
 tempfile = "3"    
+
+[dependencies]
+thiserror = "2.0.18"

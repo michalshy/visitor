@@ -13,7 +13,7 @@ pub fn list_dir(path: &Path) -> Result<Vec<VEntry>, VError> {
                 entries.push(VEntry::from_dir_entry(entry));
             } 
             Err(e) => {
-                return Err(VError::FILE_READ_ERROR{e: e.into()});
+                return Err(VError::FileReadError { e });
             }
         }
     }
@@ -23,7 +23,6 @@ pub fn list_dir(path: &Path) -> Result<Vec<VEntry>, VError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::VKind;
     use std::fs::File;
     use tempfile::tempdir;
 
@@ -32,6 +31,15 @@ mod tests {
         let dir = tempdir().unwrap();
         let entries = list_dir(dir.path()).unwrap();
         assert!(entries.is_empty());
+    }
+
+    #[test]
+    fn test_list_populated() {
+        let dir = tempdir().unwrap();
+        File::create(dir.path().join("hello.txt")).unwrap();
+
+        let entries = list_dir(dir.path()).unwrap();
+        assert_eq!(entries.len(), 1);
     }
 
 }
