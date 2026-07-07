@@ -1,4 +1,5 @@
 mod app;
+mod tui;
 use crate::app::App;
 use anyhow::Result;
 

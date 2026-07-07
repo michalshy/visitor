@@ -1,5 +1,5 @@
+pub mod state;
 mod queue;
-mod state;
 mod command;
 
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
@@ -9,6 +9,7 @@ use anyhow::Result;
 use state::State;
 use queue::{process, Queue};
 use command::Command;
+use crate::tui::draw;
 
 pub struct App
 {
@@ -35,7 +36,7 @@ impl App {
     }
 
     fn draw(&self, frame: &mut Frame) {
-        frame.render_widget(self, frame.area());
+        draw(&self.state, frame);
     }
 
     fn handle_events(&mut self) -> Result<()> {
@@ -53,12 +54,5 @@ impl App {
             KeyCode::Esc => self.exit = true,
             _ => {}
         }
-    }
-}
-
-impl Widget for &App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let mut entries: Vec<String> = Vec::new();
-
     }
 }
