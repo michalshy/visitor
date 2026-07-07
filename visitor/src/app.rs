@@ -1,23 +1,36 @@
+mod queue;
+mod state;
+mod command;
+
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::Rect, widgets::Widget};
 use anyhow::Result;
 
+use state::State;
+use queue::{process, Queue};
+use command::Command;
+
 pub struct App
 {
-    exit: bool
+    pub state: State,
+    pub queue: Queue,
+    pub exit: bool
 }
 
 impl App {
-    pub fn new() -> App {
-        return App { exit: false }
+    pub fn init() -> Result<App> {
+        let state = State::init()?;
+        let mut queue = Queue::default();
+        queue.push(Command::LIST_DIR);
+        Ok(App { state, queue, exit: false })
     }
 
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {
         while !self.exit {
+            process(&mut self.queue, &mut self.state)?;
             terminal.draw(|frame| self.draw(frame))?;
             self.handle_events()?;
         }
-
         Ok(())
     }
 
@@ -45,6 +58,7 @@ impl App {
 
 impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
+        let mut entries: Vec<String> = Vec::new();
 
     }
 }
