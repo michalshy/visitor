@@ -1,4 +1,5 @@
-use crate::app::{command::Command::{self, LIST_DIR}, state::State};
+use crate::events::{command::Command::{self, LIST_DIR}};
+use crate::app::state::State;
 use std::collections::VecDeque;
 use libvisitor::list_dir;
 use anyhow::{Ok, Result};

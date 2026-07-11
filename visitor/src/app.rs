@@ -1,15 +1,13 @@
 pub mod state;
-mod queue;
-mod command;
 
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::Rect, widgets::Widget};
-use anyhow::Result;
+use anyhow::{Ok, Result};
 
 use state::State;
-use queue::{process, Queue};
-use command::Command;
-use crate::tui::draw;
+use crate::events::queue::{process, Queue};
+use crate::events::command::Command;
+use crate::tui::{Tui};
 
 pub struct App
 {
@@ -27,32 +25,34 @@ impl App {
     }
 
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {
+        let tui = Tui::default();
         while !self.exit {
             process(&mut self.queue, &mut self.state)?;
-            terminal.draw(|frame| self.draw(frame))?;
-            self.handle_events()?;
+            terminal.draw(|frame| tui.draw(&self.state, frame))?;
+            self.handle_events(&tui)?;
         }
         Ok(())
     }
 
-    fn draw(&self, frame: &mut Frame) {
-        draw(&self.state, frame);
-    }
-
-    fn handle_events(&mut self) -> Result<()> {
+    fn handle_events(&mut self, tui: &Tui) -> Result<()> {
         match event::read()? {
             Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
-                self.handle_key(key_event);
+                return self.handle_key(key_event, tui);
             }
-            _ => {}
+            _ => { }
         };
         Ok(())
     }
 
-    fn handle_key(&mut self, key_event: KeyEvent) {
+    fn handle_key(&mut self, key_event: KeyEvent, tui: &Tui) -> Result<()> {
         match key_event.code {
             KeyCode::Esc => self.exit = true,
-            _ => {}
+            code => { 
+                if let Some(cmd) = tui.handle_input(code)? {
+                    self.queue.push(cmd);
+                }
+            }
         }
+        Ok(())
     }
 }

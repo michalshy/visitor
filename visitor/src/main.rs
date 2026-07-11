@@ -1,5 +1,7 @@
 mod app;
 mod tui;
+mod events;
+
 use crate::app::App;
 use anyhow::Result;
 
