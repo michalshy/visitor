@@ -1,5 +1,6 @@
-use std::path::Path;
+use std::path::{PathBuf};
 
 pub enum Command {
-    LIST_DIR
+    ListDir,
+    GetFileDetails { idx: usize }
 }

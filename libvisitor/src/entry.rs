@@ -56,9 +56,17 @@ impl VEntry {
 
 pub enum VKind
 {
-    File,
     Dir,
+    File,
     Symlink { target: Option<PathBuf>, broken: bool }
+}
+
+pub fn sort_rank(kind: &VKind) -> u8 {
+    match kind {
+        VKind::Dir => 0,
+        VKind::File => 1,
+        VKind::Symlink { .. } => 2,
+    }
 }
 
 pub enum VPermissions {

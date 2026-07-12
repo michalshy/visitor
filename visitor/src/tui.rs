@@ -41,8 +41,27 @@ impl Tui {
         self.draw_footer(state, frame, footer);
     }
 
-    pub fn handle_input(&self, key: KeyCode) -> Result<Option<Command>> {
-        Ok(None)
+    pub fn handle_input(&mut self, key: KeyCode) -> Result<Option<Command>> {
+        let mut stale_file = false;
+        match key {
+            KeyCode::Up => {
+                self.list_state.select_previous();
+                stale_file = true;
+            },
+            KeyCode::Down => {
+                self.list_state.select_next();
+                stale_file = true;
+            },
+            _ => {}
+        }
+        if stale_file {
+            if let Some(idx) = self.list_state.selected() {
+                return Ok(Some(Command::GetFileDetails { idx }));
+            } else {
+                return Ok(None)
+            }
+        } 
+        return Ok(None)
     }
     
     fn draw_header(&self, state: &State, frame: &mut Frame, rect: Rect) {
@@ -55,7 +74,7 @@ impl Tui {
         frame.render_widget(paragraph, rect);
     }
     
-    fn draw_main(&mut self, state: &State, frame: &mut Frame, rect: Rect) {        
+    fn draw_main(&mut self, state: &State, frame: &mut Frame, rect: Rect) {  
         let items = state.entries
             .iter()
             .enumerate()
@@ -66,8 +85,7 @@ impl Tui {
             .bg(pallete::SECONDARY_BG);
 
         let list = List::new(items)
-            .style(style)
-            .highlight_symbol("> ");
+            .style(style);
 
         frame.render_stateful_widget(list, rect, &mut self.list_state);
     }

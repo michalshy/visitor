@@ -1,4 +1,4 @@
-use crate::events::{command::Command::{self, LIST_DIR}};
+use crate::events::command::Command::{self, GetFileDetails, ListDir};
 use crate::app::state::State;
 use std::collections::VecDeque;
 use libvisitor::list_dir;
@@ -37,9 +37,12 @@ pub fn process(queue: &mut Queue, state: &mut State) -> Result<()> {
 
 fn dispatch(command: Command, state: &mut State) -> Result<()> {
     match command {
-        LIST_DIR => {
+        ListDir => {
             let entries = list_dir(&state.current_dir)?;
             state.entries = entries;
+        },
+        GetFileDetails { idx: _ } => {
+            // tbd
         }
     }
     Ok(())

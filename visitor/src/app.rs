@@ -20,7 +20,7 @@ impl App {
     pub fn init() -> Result<App> {
         let state = State::init()?;
         let mut queue = Queue::default();
-        queue.push(Command::LIST_DIR);
+        queue.push(Command::ListDir);
         Ok(App { state, queue, exit: false })
     }
 
@@ -29,12 +29,12 @@ impl App {
         while !self.exit {
             process(&mut self.queue, &mut self.state)?;
             terminal.draw(|frame| tui.draw(&self.state, frame))?;
-            self.handle_events(&tui)?;
+            self.handle_events(&mut tui)?;
         }
         Ok(())
     }
 
-    fn handle_events(&mut self, tui: &Tui) -> Result<()> {
+    fn handle_events(&mut self, tui: &mut Tui) -> Result<()> {
         match event::read()? {
             Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
                 return self.handle_key(key_event, tui);
@@ -44,7 +44,7 @@ impl App {
         Ok(())
     }
 
-    fn handle_key(&mut self, key_event: KeyEvent, tui: &Tui) -> Result<()> {
+    fn handle_key(&mut self, key_event: KeyEvent, tui: &mut Tui) -> Result<()> {
         match key_event.code {
             KeyCode::Esc => self.exit = true,
             code => { 

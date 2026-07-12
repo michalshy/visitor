@@ -1,5 +1,6 @@
 use crate::VEntry;
 use crate::VError;
+use crate::entry::sort_rank;
 
 use std::fs;
 use std::path::Path;
@@ -17,6 +18,7 @@ pub fn list_dir(path: &Path) -> Result<Vec<VEntry>, VError> {
             }
         }
     }
+    entries.sort_by_key(|e| (sort_rank(&e.kind), e.name.to_lowercase()));
     Ok(entries)
 }
 
