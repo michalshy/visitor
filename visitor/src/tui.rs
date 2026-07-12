@@ -1,10 +1,12 @@
 mod pallete;
+mod convert;
 
 use anyhow::{Ok, Result};
 use crossterm::event::KeyCode;
-use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::{Constraint, Layout, Rect}, style::{Style, Styled}, widgets::{Block, Borders, ListState, Padding, Paragraph, Widget, canvas::Line}};
+use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::{Constraint, Layout, Rect}, style::{Color, Modifier, Style, Styled}, widgets::{Block, Borders, List, ListState, Padding, Paragraph, Widget, canvas::Line}};
 use crate::app::state::State;
 use crate::events::command::Command;
+use convert::{to_list_item, highlighted};
 
 #[derive(Default)]
 pub struct Tui {
@@ -12,7 +14,11 @@ pub struct Tui {
 }
 
 impl Tui {
-    pub fn draw(&self, state: &State, frame: &mut Frame) {
+    pub fn new() -> Tui {
+        Tui { list_state: ListState::default().with_selected(Some(0)) }
+    }
+
+    pub fn draw(&mut self, state: &State, frame: &mut Frame) {
         let outer = Block::default()
             .borders(Borders::ALL)
             .padding(Padding { left: 1, right: 1, top: 0, bottom: 0 })
@@ -49,15 +55,21 @@ impl Tui {
         frame.render_widget(paragraph, rect);
     }
     
-    fn draw_main(&self, state: &State, frame: &mut Frame, rect: Rect) {
-        let bg = Style::default().bg(pallete::SECONDARY_BG);
-    
-        let paragraph = Paragraph::new("")
-            .style(bg);
-    
-    
-    
-        frame.render_widget(paragraph, rect);
+    fn draw_main(&mut self, state: &State, frame: &mut Frame, rect: Rect) {        
+        let items = state.entries
+            .iter()
+            .enumerate()
+            .map(|(idx, e)| 
+                to_list_item(e, highlighted(idx, self.list_state.selected())));
+
+        let style = Style::default()
+            .bg(pallete::SECONDARY_BG);
+
+        let list = List::new(items)
+            .style(style)
+            .highlight_symbol("> ");
+
+        frame.render_stateful_widget(list, rect, &mut self.list_state);
     }
     
     fn draw_footer(&self, state: &State, frame: &mut Frame, rect: Rect) {

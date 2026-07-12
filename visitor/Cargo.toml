@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.103"
+chrono = "0.4.45"
 crossterm = "0.29.0"
 libvisitor = { path = "../libvisitor" }
 ratatui = "0.30.2"

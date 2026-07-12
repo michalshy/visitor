@@ -25,7 +25,7 @@ impl App {
     }
 
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {
-        let tui = Tui::default();
+        let mut tui = Tui::new();
         while !self.exit {
             process(&mut self.queue, &mut self.state)?;
             terminal.draw(|frame| tui.draw(&self.state, frame))?;

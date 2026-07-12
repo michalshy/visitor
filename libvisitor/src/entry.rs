@@ -1,4 +1,4 @@
-use std::{fs::{self, DirEntry}, os::unix::fs::MetadataExt, path::PathBuf, time::SystemTime};
+use std::{fmt::Display, fs::{self, DirEntry}, os::unix::fs::MetadataExt, path::PathBuf, time::SystemTime};
 
 pub struct VEntry
 {
