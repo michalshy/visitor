@@ -2,14 +2,17 @@ pub mod state;
 
 use std::time::Duration;
 
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
+use crossterm::event::{self, KeyCode, KeyEvent, KeyEventKind, Event};
 use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::Rect, widgets::Widget};
 use anyhow::{Ok, Result};
 
 use state::State;
 use crate::events::queue::{process, Queue};
 use crate::events::command::Command;
+use crate::events::callback::{self, Callback};
 use crate::tui::{Tui};
+
+use std::sync::mpsc;
 
 pub struct App
 {
@@ -27,9 +30,11 @@ impl App {
     }
 
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {
-        let mut tui = Tui::new();
+        let (tx, rx) = mpsc::channel::<Callback>();
+        let mut tui = Tui::new(rx);
         while !self.exit {
-            process(&mut self.queue, &mut self.state)?;
+            process(&mut self.queue, &mut self.state, tx.clone())?;
+            tui.update()?;
             terminal.draw(|frame| tui.draw(&self.state, frame))?;
             if event::poll(Duration::from_millis(16))? {
                 self.handle_events(&mut tui)?;

@@ -1,6 +1,8 @@
+use crate::events::callback::Callback;
 use crate::events::command::Command::{self};
 use crate::app::state::State;
 use std::collections::VecDeque;
+use std::sync::mpsc::Sender;
 use libvisitor::{VKind, list_dir};
 use anyhow::{Error, Ok, Result};
 
@@ -23,19 +25,26 @@ impl Queue {
     }
 }
 
-pub fn process(queue: &mut Queue, state: &mut State) -> Result<()> {
+pub fn process(
+    queue: &mut Queue, 
+    state: &mut State, 
+    tx: Sender<Callback>) 
+-> Result<()> {
     if queue.is_empty() {
         return Ok(());
     }
 
     let command = queue.pop();
     if command.is_some() {
-        dispatch(command.unwrap(), state, queue)?;
+        let result = dispatch(command.unwrap(), state, queue)?;
+        if let Some(callback) = result {
+            tx.send(callback)?;
+        }
     }
     Ok(())
 }
 
-fn dispatch(command: Command, state: &mut State, queue: &mut Queue) -> Result<()> {
+fn dispatch(command: Command, state: &mut State, queue: &mut Queue) -> Result<Option<Callback>> {
     match command {
         Command::ListDir => {
             let entries = list_dir(&state.current_dir)?;
@@ -45,6 +54,7 @@ fn dispatch(command: Command, state: &mut State, queue: &mut Queue) -> Result<()
             if let Some(path) = state.current_dir.parent() {
                 state.current_dir = path.to_path_buf();
                 queue.push(Command::ListDir);
+                return Ok(Some(Callback::MoveToParent))
             }
         },
         Command::Execute { idx } => {
@@ -54,6 +64,7 @@ fn dispatch(command: Command, state: &mut State, queue: &mut Queue) -> Result<()
                     let new_path = state.current_dir.join(new_dir);
                     state.current_dir = new_path;
                     queue.push(Command::ListDir);
+                    return Ok(Some(Callback::MoveToChild))
                 }
                 VKind::Symlink { target, broken } => {
 
@@ -67,5 +78,5 @@ fn dispatch(command: Command, state: &mut State, queue: &mut Queue) -> Result<()
             // tbd
         }
     }
-    Ok(())
+    Ok(None)
 }

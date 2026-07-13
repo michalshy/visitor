@@ -1,24 +1,39 @@
 mod pallete;
 mod convert;
 
-use anyhow::{Ok, Result};
+use std::{collections::{HashMap, VecDeque}, path::PathBuf, sync::mpsc::Receiver};
+
+use anyhow::Result;
 use crossterm::event::KeyCode;
 use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::{Constraint, Layout, Rect}, style::{Color, Modifier, Style, Styled}, widgets::{Block, Borders, List, ListState, Padding, Paragraph, Widget, canvas::Line}};
-use crate::app::state::State;
+use crate::{app::state::State, events::callback::Callback};
 use crate::events::command::Command;
 use convert::{to_list_item, highlighted};
 
 const DEFAULT_PREVIEW: u8 = 40;
 
-#[derive(Default)]
 pub struct Tui {
+    indices: VecDeque<usize>,
     list_state: ListState,
-    preview_size: u8 // in percentage
+    preview_size: u8, // in percentage
+    callback_channel: Receiver<Callback>
 }
 
 impl Tui {
-    pub fn new() -> Tui {
-        Tui { list_state: ListState::default().with_selected(Some(0)), preview_size: DEFAULT_PREVIEW }
+    pub fn new(rx: Receiver<Callback>) -> Tui {
+        Tui { 
+            indices: VecDeque::new(), 
+            list_state: ListState::default().with_selected(Some(0)), 
+            preview_size: DEFAULT_PREVIEW,
+            callback_channel: rx
+        }
+    }
+
+    pub fn update(&mut self) -> Result<()> {
+        while let Ok(event) = self.callback_channel.try_recv() {
+            self.on_event(event)?;
+        }
+        Ok(())
     }
 
     pub fn draw(&mut self, state: &State, frame: &mut Frame) {
@@ -137,9 +152,24 @@ impl Tui {
             .bg(pallete::PRIMARY_BG)
             .fg(pallete::MUTED_TXT);
     
-        let paragraph = Paragraph::new("⏎ backspace")
+        let paragraph = Paragraph::new("move up ⏎")
             .style(style).alignment(ratatui::layout::HorizontalAlignment::Right);
     
         frame.render_widget(paragraph, rect);
+    }
+
+    fn on_event(&mut self, event: Callback) -> Result<()> {
+        match event {
+            Callback::MoveToParent => {
+                self.list_state.select(self.indices.pop_front());
+            },
+            Callback::MoveToChild => {
+                if let Some(idx) = self.list_state.selected() {
+                    self.indices.push_back(idx);   
+                    self.list_state.select_first();
+                }
+            }
+        }
+        Ok(())
     }
 }
