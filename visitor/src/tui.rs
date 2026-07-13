@@ -66,7 +66,14 @@ impl Tui {
                 }
             },
             KeyCode::Backspace => {
-                return Ok(Some(Command::MoveUp));
+                return Ok(Some(Command::MoveToParent));
+            },
+            KeyCode::Enter => {
+                if let Some(idx) = self.list_state.selected() {
+                    return Ok(Some(Command::Execute { idx }));
+                } else {
+                    return Ok(None)
+                }
             }
             _ => {}
         }

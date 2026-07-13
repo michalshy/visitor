@@ -2,6 +2,7 @@ use std::path::{PathBuf};
 
 pub enum Command {
     ListDir,
-    MoveUp,
-    GetFileDetails { idx: usize }
+    MoveToParent,
+    GetFileDetails { idx: usize },
+    Execute { idx: usize }
 }

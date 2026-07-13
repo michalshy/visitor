@@ -1,7 +1,7 @@
 use crate::events::command::Command::{self};
 use crate::app::state::State;
 use std::collections::VecDeque;
-use libvisitor::list_dir;
+use libvisitor::{VKind, list_dir};
 use anyhow::{Error, Ok, Result};
 
 #[derive(Default)]
@@ -41,10 +41,26 @@ fn dispatch(command: Command, state: &mut State, queue: &mut Queue) -> Result<()
             let entries = list_dir(&state.current_dir)?;
             state.entries = entries;
         },
-        Command::MoveUp => {
+        Command::MoveToParent => {
             if let Some(path) = state.current_dir.parent() {
                 state.current_dir = path.to_path_buf();
                 queue.push(Command::ListDir);
+            }
+        },
+        Command::Execute { idx } => {
+            match &state.entries[idx].kind {
+                VKind::Dir => {
+                    let new_dir = &state.entries[idx].name;
+                    let new_path = state.current_dir.join(new_dir);
+                    state.current_dir = new_path;
+                    queue.push(Command::ListDir);
+                }
+                VKind::Symlink { target, broken } => {
+
+                }
+                VKind::File => {
+
+                }
             }
         },
         Command::GetFileDetails { idx: _ } => {
