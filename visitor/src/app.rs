@@ -1,5 +1,7 @@
 pub mod state;
 
+use std::time::Duration;
+
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::Rect, widgets::Widget};
 use anyhow::{Ok, Result};
@@ -29,7 +31,9 @@ impl App {
         while !self.exit {
             process(&mut self.queue, &mut self.state)?;
             terminal.draw(|frame| tui.draw(&self.state, frame))?;
-            self.handle_events(&mut tui)?;
+            if event::poll(Duration::from_millis(16))? {
+                self.handle_events(&mut tui)?;
+            }
         }
         Ok(())
     }

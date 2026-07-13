@@ -11,7 +11,7 @@ pub const SELECTED_TXT: Color = Color::Rgb(255, 255, 255);
 pub const PRIMARY_TXT: Color = Color::Rgb(216, 218, 229);
 pub const SECONDARY_TXT: Color = Color::Rgb(168, 176, 200);
 pub const MUTED_TXT: Color = Color::Rgb(107, 110, 133);
-pub const DIMMED_TXT: Color = Color::Rgb(58, 60, 77);
+pub const DIMMED_TXT: Color = Color::Rgb(102, 104, 121);
 
 // elements
 pub const DIR: Color = Color::Rgb(127, 180, 232);

@@ -8,14 +8,17 @@ use crate::app::state::State;
 use crate::events::command::Command;
 use convert::{to_list_item, highlighted};
 
+const DEFAULT_PREVIEW: u8 = 40;
+
 #[derive(Default)]
 pub struct Tui {
     list_state: ListState,
+    preview_size: u8 // in percentage
 }
 
 impl Tui {
     pub fn new() -> Tui {
-        Tui { list_state: ListState::default().with_selected(Some(0)) }
+        Tui { list_state: ListState::default().with_selected(Some(0)), preview_size: DEFAULT_PREVIEW }
     }
 
     pub fn draw(&mut self, state: &State, frame: &mut Frame) {
@@ -52,6 +55,19 @@ impl Tui {
                 self.list_state.select_next();
                 stale_file = true;
             },
+            KeyCode::Char(']') => {
+                if self.preview_size > 2 {
+                    self.preview_size = self.preview_size.saturating_sub(1);
+                }
+            },
+            KeyCode::Char('[') => {
+                if self.preview_size < 99 {
+                    self.preview_size = self.preview_size.saturating_add(1);
+                }
+            },
+            KeyCode::Backspace => {
+                return Ok(Some(Command::MoveUp));
+            }
             _ => {}
         }
         if stale_file {
@@ -74,7 +90,18 @@ impl Tui {
         frame.render_widget(paragraph, rect);
     }
     
-    fn draw_main(&mut self, state: &State, frame: &mut Frame, rect: Rect) {  
+    fn draw_main(&mut self, state: &State, frame: &mut Frame, rect: Rect) {
+        let list_size = 100 - self.preview_size;
+        let [list, preview] = Layout::horizontal([
+            Constraint::Percentage(list_size as u16),
+            Constraint::Percentage(self.preview_size as u16)
+        ]).spacing(1).areas(rect);
+
+        self.draw_list(state, frame, list);
+        self.draw_preview(state, frame, preview);
+    }
+
+    fn draw_list(&mut self, state: &State, frame: &mut Frame, rect: Rect) {
         let items = state.entries
             .iter()
             .enumerate()
@@ -89,12 +116,22 @@ impl Tui {
 
         frame.render_stateful_widget(list, rect, &mut self.list_state);
     }
+
+    fn draw_preview(&mut self, state: &State, frame: &mut Frame, rect: Rect) {
+        let style = Style::default()
+            .bg(pallete::SECONDARY_BG);
+
+        let block = Block::default().style(style);
+        frame.render_widget(block, rect);
+    }
     
     fn draw_footer(&self, state: &State, frame: &mut Frame, rect: Rect) {
-        let bg = Style::default().bg(pallete::PRIMARY_BG);
+        let style: Style = Style::default()
+            .bg(pallete::PRIMARY_BG)
+            .fg(pallete::MUTED_TXT);
     
-        let paragraph = Paragraph::new("")
-            .style(bg);
+        let paragraph = Paragraph::new("⏎ backspace")
+            .style(style).alignment(ratatui::layout::HorizontalAlignment::Right);
     
         frame.render_widget(paragraph, rect);
     }

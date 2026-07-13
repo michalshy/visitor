@@ -1,8 +1,8 @@
-use crate::events::command::Command::{self, GetFileDetails, ListDir};
+use crate::events::command::Command::{self};
 use crate::app::state::State;
 use std::collections::VecDeque;
 use libvisitor::list_dir;
-use anyhow::{Ok, Result};
+use anyhow::{Error, Ok, Result};
 
 #[derive(Default)]
 pub struct Queue {
@@ -30,18 +30,24 @@ pub fn process(queue: &mut Queue, state: &mut State) -> Result<()> {
 
     let command = queue.pop();
     if command.is_some() {
-        dispatch(command.unwrap(), state)?;
+        dispatch(command.unwrap(), state, queue)?;
     }
     Ok(())
 }
 
-fn dispatch(command: Command, state: &mut State) -> Result<()> {
+fn dispatch(command: Command, state: &mut State, queue: &mut Queue) -> Result<()> {
     match command {
-        ListDir => {
+        Command::ListDir => {
             let entries = list_dir(&state.current_dir)?;
             state.entries = entries;
         },
-        GetFileDetails { idx: _ } => {
+        Command::MoveUp => {
+            if let Some(path) = state.current_dir.parent() {
+                state.current_dir = path.to_path_buf();
+                queue.push(Command::ListDir);
+            }
+        },
+        Command::GetFileDetails { idx: _ } => {
             // tbd
         }
     }

@@ -13,10 +13,16 @@ pub fn highlighted(idx: usize, selected: Option<usize>) -> bool {
 pub fn to_list_item(entry: &VEntry, highlighted: bool) -> ListItem<'_> {
     let modified: DateTime<Local> = entry.modified.into();
 
-    let bg_colour = if highlighted {
+    let bg_color = if highlighted {
         pallete::SELECTED
     } else {
         pallete::SECONDARY_BG
+    };
+
+    let fg_color = if highlighted {
+        pallete::SELECTED_TXT
+    } else {
+        line_color(entry)
     };
 
     let name = Span::raw(format!("{:<30}", entry.name.clone()));
@@ -24,7 +30,7 @@ pub fn to_list_item(entry: &VEntry, highlighted: bool) -> ListItem<'_> {
     let modified = Span::default().content(modified.format("%d/%m/%Y %T     ").to_string());
     let permission = Span::default().content(format!("{:<10}", entry.permissions));
 
-    let style = Style::default().bg(bg_colour).fg(line_color(entry));
+    let style = Style::default().bg(bg_color).fg(fg_color);
     
     let line = Line::default().spans([
         name,
