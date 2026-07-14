@@ -162,7 +162,16 @@ impl Tui {
     fn on_event(&mut self, event: Callback) -> Result<()> {
         match event {
             Callback::MoveToParent => {
-                self.list_state.select(self.indices.pop_front());
+                let idx = self.indices.pop_front();
+                match idx {
+                    Some(i) => {
+                        info!("Popped index from TUI stack: {}", i);
+                        self.list_state.select(idx);
+                    },
+                    None => {
+                        info!("Nothing to pop out of TUI stack");
+                    }
+                }
             },
             Callback::MoveToChild => {
                 if let Some(idx) = self.list_state.selected() {

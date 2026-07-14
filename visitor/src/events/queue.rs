@@ -44,35 +44,50 @@ pub fn process(
     Ok(())
 }
 
+fn event_list_dir(state: &mut State) -> Result<()> {
+    let entries = list_dir(&state.current_dir)?;
+    state.entries = entries;
+    Ok(())
+}
+
+fn event_move_parent(state: &mut State) -> Result<Option<Callback>> {
+    if let Some(path) = state.current_dir.parent() {
+        state.current_dir = path.to_path_buf();
+        event_list_dir(state)?;
+        return Ok(Some(Callback::MoveToParent))
+    }
+    Ok(None)
+}
+
+fn event_execute(state: &mut State, idx: usize) -> Result<Option<Callback>> {
+    match &state.entries[idx].kind {
+        VKind::Dir => {
+            let new_dir = &state.entries[idx].name;
+            let new_path = state.current_dir.join(new_dir);
+            state.current_dir = new_path;
+            event_list_dir(state)?;
+            return Ok(Some(Callback::MoveToChild))
+        }
+        VKind::Symlink { target, broken } => {
+
+        }
+        VKind::File => {
+
+        }
+    }
+    Ok(None)
+}
+
 fn dispatch(command: Command, state: &mut State, queue: &mut Queue) -> Result<Option<Callback>> {
     match command {
         Command::ListDir => {
-            let entries = list_dir(&state.current_dir)?;
-            state.entries = entries;
+            event_list_dir(state)?;
         },
         Command::MoveToParent => {
-            if let Some(path) = state.current_dir.parent() {
-                state.current_dir = path.to_path_buf();
-                queue.push(Command::ListDir);
-                return Ok(Some(Callback::MoveToParent))
-            }
+            return Ok(event_move_parent(state)?);
         },
         Command::Execute { idx } => {
-            match &state.entries[idx].kind {
-                VKind::Dir => {
-                    let new_dir = &state.entries[idx].name;
-                    let new_path = state.current_dir.join(new_dir);
-                    state.current_dir = new_path;
-                    queue.push(Command::ListDir);
-                    return Ok(Some(Callback::MoveToChild))
-                }
-                VKind::Symlink { target, broken } => {
-
-                }
-                VKind::File => {
-
-                }
-            }
+            return Ok(event_execute(state, idx)?);
         },
         Command::GetFileDetails { idx: _ } => {
             // tbd
