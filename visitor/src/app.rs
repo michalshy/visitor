@@ -1,4 +1,5 @@
 pub mod state;
+mod logger;
 
 use std::time::Duration;
 
@@ -7,6 +8,7 @@ use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::Rect, widgets::Wid
 use anyhow::{Ok, Result};
 
 use state::State;
+use crate::app::logger::Logger;
 use crate::events::queue::{process, Queue};
 use crate::events::command::Command;
 use crate::events::callback::{self, Callback};
@@ -16,17 +18,19 @@ use std::sync::mpsc;
 
 pub struct App
 {
-    pub state: State,
-    pub queue: Queue,
-    pub exit: bool
+    state: State,
+    queue: Queue,
+    _logger: Logger,
+    exit: bool
 }
 
 impl App {
     pub fn init() -> Result<App> {
+        let _logger = Logger::new();
         let state = State::init()?;
         let mut queue = Queue::default();
         queue.push(Command::ListDir);
-        Ok(App { state, queue, exit: false })
+        Ok(App { state, queue, _logger, exit: false })
     }
 
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {

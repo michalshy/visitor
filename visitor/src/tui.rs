@@ -9,6 +9,7 @@ use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::{Constraint, Layou
 use crate::{app::state::State, events::callback::Callback};
 use crate::events::command::Command;
 use convert::{to_list_item, highlighted};
+use tracing::{info, warn, error, debug};
 
 const DEFAULT_PREVIEW: u8 = 40;
 
@@ -165,7 +166,8 @@ impl Tui {
             },
             Callback::MoveToChild => {
                 if let Some(idx) = self.list_state.selected() {
-                    self.indices.push_back(idx);   
+                    self.indices.push_back(idx);
+                    info!("Pushed index: {}", idx);   
                     self.list_state.select_first();
                 }
             }
