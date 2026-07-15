@@ -6,7 +6,7 @@ use std::{collections::{HashMap, VecDeque}, path::PathBuf, sync::mpsc::Receiver}
 use anyhow::Result;
 use crossterm::event::KeyCode;
 use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::{Constraint, Layout, Rect}, style::{Color, Modifier, Style, Styled}, widgets::{Block, Borders, List, ListState, Padding, Paragraph, Widget, canvas::Line}};
-use crate::{app::state::State, events::callback::Callback};
+use crate::{app::state::{PickType, State}, events::callback::Callback};
 use crate::events::command::Command;
 use convert::{to_list_item, highlighted};
 use tracing::{info, warn, error, debug};
@@ -14,8 +14,9 @@ use tracing::{info, warn, error, debug};
 const DEFAULT_PREVIEW: u8 = 40;
 
 pub struct Tui {
-    indices: VecDeque<usize>,
-    list_state: ListState,
+    indices: VecDeque<usize>, // saved indices
+    list_state: ListState, // list of current entries
+
     preview_size: u8, // in percentage
     callback_channel: Receiver<Callback>
 }
@@ -81,6 +82,17 @@ impl Tui {
                     self.preview_size = self.preview_size.saturating_add(1);
                 }
             },
+            KeyCode::Char('c') => {
+                let idx = self.list_state.selected().unwrap_or(0);
+                return Ok(Some(Command::Pick{ idx, pick_type: PickType::Copy }))  
+            },
+            KeyCode::Char('x') => {
+                let idx = self.list_state.selected().unwrap_or(0);
+                return Ok(Some(Command::Pick{ idx, pick_type: PickType::Cut }))  
+            },
+            KeyCode::Char('v') => {
+                return Ok(Some(Command::ActPicked))
+            }
             KeyCode::Backspace => {
                 return Ok(Some(Command::MoveToParent));
             },
@@ -179,6 +191,9 @@ impl Tui {
                     info!("Pushed index: {}", idx);   
                     self.list_state.select_first();
                 }
+            },
+            Callback::RefreshList => {
+                
             }
         }
         Ok(())

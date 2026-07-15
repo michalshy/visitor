@@ -1,9 +1,10 @@
 use std::{fmt::Display, fs::{self, DirEntry}, os::unix::fs::MetadataExt, path::PathBuf, time::SystemTime};
 
+#[derive(Clone)]
 pub struct VEntry
 {
     pub name: String,
-    pub path: String,
+    pub path: PathBuf,
     pub kind: VKind,
     pub size: u64,
     pub modified: SystemTime,
@@ -14,7 +15,7 @@ pub struct VEntry
 impl VEntry {
     pub fn from_dir_entry(de: DirEntry) -> VEntry {
         let name = de.file_name().into_string().unwrap();
-        let path = de.path().to_string_lossy().to_string();
+        let path = de.path();
         let metadata = de.metadata().unwrap();
         let size = metadata.size();
         let modified = metadata.modified().unwrap();
@@ -54,6 +55,7 @@ impl VEntry {
     }
 }
 
+#[derive(Clone)]
 pub enum VKind
 {
     Dir,
@@ -69,6 +71,7 @@ pub fn sort_rank(kind: &VKind) -> u8 {
     }
 }
 
+#[derive(Clone)]
 pub enum VPermissions {
     Unix { mode: u32 },
     Basic { readonly: bool },

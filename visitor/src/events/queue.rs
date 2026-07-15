@@ -1,9 +1,9 @@
 use crate::events::callback::Callback;
 use crate::events::command::Command::{self};
-use crate::app::state::State;
+use crate::app::state::{PickType, State};
 use std::collections::VecDeque;
 use std::sync::mpsc::Sender;
-use libvisitor::{VKind, list_dir};
+use libvisitor::{VKind, act_copy, act_move, list_dir};
 use anyhow::{Error, Ok, Result};
 
 #[derive(Default)]
@@ -91,6 +91,26 @@ fn dispatch(command: Command, state: &mut State, queue: &mut Queue) -> Result<Op
         },
         Command::GetFileDetails { idx: _ } => {
             // tbd
+        },
+        Command::Pick { idx, pick_type } => {
+            let entry = state.entries[idx].clone();
+            state.pick(entry, pick_type);
+        },
+        Command::ActPicked => {
+            match state.get_picked() {
+                Some(p) => {
+                    match p.pick_type {
+                        PickType::Copy => {
+                            act_copy(p.path, state.current_dir.clone())?; // unused return
+                        },
+                        PickType::Cut => {
+                            act_move(p.path, state.current_dir.clone())?;
+                        }
+                    }
+                    event_list_dir(state)?
+                },
+                None => {}
+            }
         }
     }
     Ok(None)
