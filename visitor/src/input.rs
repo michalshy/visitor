@@ -1,10 +1,18 @@
 use anyhow::Result;
 use crossterm::event::KeyCode;
-use crate::state::PickType;
+use crate::state::Mode::{Normal, PopUp};
+use crate::state::{Mode, PickType};
 
 use crate::{action::Action};
 
-pub fn map_key(key: KeyCode) -> Option<Action> {
+pub fn map_key(key: KeyCode, mode: &Mode) -> Option<Action> {
+    match mode {
+        Normal => map_normal(key),
+        PopUp { .. } => map_popup(key)
+    } 
+}
+
+pub fn map_normal(key: KeyCode) -> Option<Action> {
     match key {
         KeyCode::Up => Some(Action::CursorUp),
         KeyCode::Down => Some(Action::CursorDown),
@@ -19,4 +27,14 @@ pub fn map_key(key: KeyCode) -> Option<Action> {
         KeyCode::Enter => Some(Action::ExecuteCursor),
         _ => None
     }   
+}
+
+pub fn map_popup(key: KeyCode) -> Option<Action> {
+    match key {
+        KeyCode::Char(c) => Some(Action::PopupType{c}),
+        KeyCode::Backspace => Some(Action::PopupRevert),
+        KeyCode::Esc => Some(Action::PopupCancel),
+        KeyCode::Enter => Some(Action::PopupConfirm),
+        _ => None
+    }
 }

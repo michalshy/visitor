@@ -8,7 +8,7 @@ use anyhow::{Ok, Result};
 
 use crate::app::logger::Logger;
 use crate::input;
-use crate::state::State;
+use crate::state::{Mode, State};
 use crate::update::update;
 use crate::view::draw;
 
@@ -31,19 +31,19 @@ impl App {
             terminal.draw(|frame| draw(&mut self.state, frame))?;
             if event::poll(Duration::from_millis(16))? {
                 if let Event::Key(k) = event::read()? {
-                    self.handle_event(k)?;       
+                    self.handle_event(k, mode)?;       
                 }
             }
         }
         Ok(())
     }
 
-    fn handle_event(&mut self, event: KeyEvent) -> Result<()> {
+    fn handle_event(&mut self, event: KeyEvent, mode: &Mode) -> Result<()> {
         if event.kind == KeyEventKind::Press {
             match event.code {
                 KeyCode::Esc => self.exit = true,
                 _ => {
-                    if let Some(action) = input::map_key(event.code) {
+                    if let Some(action) = input::map_key(event.code, mode) {
                         update(&mut self.state, action)?;
                     }
                 }

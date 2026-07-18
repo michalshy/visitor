@@ -37,7 +37,7 @@ pub fn draw(state: &mut State, frame: &mut Frame) {
 
         }
         PopUp { state } => {
-
+            popup::draw(state, frame, inner);
         }
     }
 }

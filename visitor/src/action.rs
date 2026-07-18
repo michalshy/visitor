@@ -11,4 +11,9 @@ pub enum Action {
     Paste,
     Delete,
     NewEntry,
+
+    PopupType{ c: char },
+    PopupRevert,
+    PopupConfirm,
+    PopupCancel
 }
