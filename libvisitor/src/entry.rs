@@ -1,4 +1,6 @@
-use std::{fmt::Display, fs::{self, DirEntry}, os::unix::fs::MetadataExt, path::PathBuf, time::SystemTime};
+use std::{fs::{self, DirEntry}, os::unix::fs::MetadataExt, path::PathBuf, time::SystemTime};
+
+use crate::VError;
 
 #[derive(Clone)]
 pub struct VEntry
@@ -13,12 +15,12 @@ pub struct VEntry
 }
 
 impl VEntry {
-    pub fn from_dir_entry(de: DirEntry) -> VEntry {
-        let name = de.file_name().into_string().unwrap();
+    pub fn from_dir_entry(de: DirEntry) -> Result<VEntry, VError> {
+        let name = de.file_name().to_string_lossy().into_owned();
         let path = de.path();
-        let metadata = de.metadata().unwrap();
+        let metadata = de.metadata().map_err(|e| VError::Read { e })?;
         let size = metadata.size();
-        let modified = metadata.modified().unwrap();
+        let modified = metadata.modified().map_err(|e| VError::Read { e })?;
         let permissions = VPermissions::from_metadata(&metadata);
         let hidden = is_hidden(&name, &metadata);
 
@@ -43,7 +45,7 @@ impl VEntry {
             }            
         }
 
-        VEntry { 
+        Ok(VEntry { 
             name, 
             path, 
             kind,
@@ -51,7 +53,7 @@ impl VEntry {
             modified, 
             permissions, 
             hidden
-        }
+        })
     }
 }
 

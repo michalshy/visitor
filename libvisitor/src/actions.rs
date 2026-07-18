@@ -5,21 +5,21 @@ use std::path::{Path, PathBuf};
 
 pub fn act_create_file(path: PathBuf) -> Result<File, VError>{
     match File::open(path) {
-        Err(e) => { return Err(VError::FileCreateError { e }) },
+        Err(e) => { return Err(VError::Create { e }) },
         Ok(f) => { return Ok(f) }
     }
 }
 
 pub fn act_create_dir(path: PathBuf) -> Result<(), VError> {
     match fs::create_dir(path) {
-        Err(e) => { return Err(VError::DirCreateError { e }) },
+        Err(e) => { return Err(VError::Create { e }) },
         _ => Ok(())
     }
 }
 
 pub fn act_delete(path: PathBuf) -> Result<(), VError> {
     match fs::remove_file(path) {
-        Err(e) => { return Err(VError::DirCreateError { e }) },
+        Err(e) => { return Err(VError::Delete { e }) },
         _ => Ok(())
     }
 }
@@ -30,18 +30,21 @@ pub fn act_copy(from: PathBuf, to: PathBuf) -> Result<u64, VError> {
             Ok(size)
         },
         Err(e) => {
-            Err(VError::FileCopyError { e })
+            Err(VError::Copy { e })
         }
     }
 }
 
-pub fn act_move(from: PathBuf, to: PathBuf) -> Result<u64, VError> {
-    act_copy(from, to)
-    // remove later
+pub fn act_move(from: PathBuf, to: PathBuf) -> Result<(), VError> {
+    act_copy(from.clone(), to)?;
+    act_delete(from)
 }
 
-pub fn act_rename() {
-    //fs::rename(from, to)
+pub fn act_rename(from: PathBuf, to: PathBuf) -> Result<(), VError>  {
+    match fs::rename(from, to) {
+        Err(e) => { return Err(VError::Rename { e }) },
+        _ => Ok(())
+    }
 }
 
 pub fn act_create_symlink() {

@@ -7,17 +7,25 @@ use std::path::Path;
 
 pub fn list_dir(path: &Path) -> Result<Vec<VEntry>, VError> {
     let mut entries: Vec<VEntry> = Vec::new();
-    let curr = fs::read_dir(path).unwrap();
-    for path in curr {
-        match path {
-            Ok(entry) => {
-                entries.push(VEntry::from_dir_entry(entry));
-            } 
-            Err(e) => {
-                return Err(VError::FileReadError { e });
+    let res = fs::read_dir(path);
+    match res {
+        Ok(dir) => {
+            for path in dir {
+                match path {
+                    Ok(entry) => {
+                        entries.push(VEntry::from_dir_entry(entry)?);
+                    } 
+                    Err(e) => {
+                        return Err(VError::Read { e });
+                    }
+                }
             }
+        },
+        Err(e) => {
+            return Err(VError::Read { e })
         }
     }
+    
     entries.sort_by_key(|e| (sort_rank(&e.kind), e.name.to_lowercase()));
     Ok(entries)
 }

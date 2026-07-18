@@ -10,7 +10,8 @@ pub fn draw(state: &State, frame: &mut Frame, rect: Rect) {
         .bg(pallete::PRIMARY_BG)
         .fg(pallete::MUTED_TXT);
 
-    let paragraph = Paragraph::new("move up ⏎")
+    let paragraph = Paragraph::new(
+        "[rename r] [copy c] [cut x] [paste v] [enter ↵] [move up ⏎]")
         .style(style).alignment(ratatui::layout::HorizontalAlignment::Right);
 
     frame.render_widget(paragraph, rect);
