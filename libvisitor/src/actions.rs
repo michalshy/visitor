@@ -1,7 +1,7 @@
-use crate::{VEntry, VError};
+use crate::VError;
 
 use std::fs::{self, File};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 pub fn act_create_file(path: PathBuf) -> Result<File, VError>{
     match File::open(path) {
@@ -36,6 +36,13 @@ pub fn act_copy(from: PathBuf, to: PathBuf) -> Result<u64, VError> {
 }
 
 pub fn act_move(from: PathBuf, to: PathBuf) -> Result<(), VError> {
+    if let Some(from_p) = from.clone().parent() 
+        && let Some(to_p) = to.clone().parent() {
+        if from_p == to_p {
+            return act_rename(from, to);
+        }
+    } 
+
     act_copy(from.clone(), to)?;
     act_delete(from)
 }
@@ -62,7 +69,6 @@ pub fn act_extract() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs::File;
     use tempfile::tempdir;
 
     #[test]

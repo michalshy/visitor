@@ -98,12 +98,14 @@ fn act_pick(state: &mut State, idx: usize, pick_type: PickType) -> Result<()>  {
 fn act_paste(state: &mut State) -> Result<()> {
     match state.get_picked() {
         Some(p) => {
+            let file_name = p.path.file_name()
+                .unwrap_or_default().to_string_lossy().into_owned();
             match p.pick_type {
                 PickType::Copy => {
-                    act_copy(p.path, state.current_dir.clone())?; // unused return
+                    act_copy(p.path, state.current_dir.clone().join(file_name))?; // unused return
                 },
                 PickType::Cut => {
-                    act_move(p.path, state.current_dir.clone())?;
+                    act_move(p.path, state.current_dir.clone().join(file_name))?;
                 }
             }
             update_entries(state)?;

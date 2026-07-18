@@ -48,10 +48,6 @@ impl State {
         self.picked = None;
     }
 
-    pub fn picked(self) -> Option<Picked> {
-        self.picked
-    }
-
     pub fn get_picked(&self) -> Option<Picked> {
         self.picked.clone()
     }
