@@ -3,23 +3,20 @@ mod logger;
 use std::time::Duration;
 
 use crossterm::event::{self, KeyCode, KeyEvent, KeyEventKind, Event};
-use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::Rect, widgets::Widget};
+use ratatui::{DefaultTerminal};
 use anyhow::{Ok, Result};
 
 use crate::app::logger::Logger;
-use crate::action::Action;
 use crate::input;
 use crate::state::State;
 use crate::update::update;
 use crate::view::draw;
 
-use std::sync::mpsc;
-
 pub struct App
 {
     state: State,
     _logger: Logger,
-    exit: bool
+    exit: bool,
 }
 
 impl App {
@@ -34,8 +31,20 @@ impl App {
             terminal.draw(|frame| draw(&mut self.state, frame))?;
             if event::poll(Duration::from_millis(16))? {
                 if let Event::Key(k) = event::read()? {
-                    if let Some(action) = input::map_key(k.code) {
-                        update(&mut self.state, action)?;       // mutate state — the one call
+                    self.handle_event(k)?;       
+                }
+            }
+        }
+        Ok(())
+    }
+
+    fn handle_event(&mut self, event: KeyEvent) -> Result<()> {
+        if event.kind == KeyEventKind::Press {
+            match event.code {
+                KeyCode::Esc => self.exit = true,
+                _ => {
+                    if let Some(action) = input::map_key(event.code) {
+                        update(&mut self.state, action)?;
                     }
                 }
             }

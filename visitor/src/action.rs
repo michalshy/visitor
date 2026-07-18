@@ -5,10 +5,10 @@ use crate::state::PickType;
 pub enum Action {
     CursorUp,
     CursorDown,
-    ExecuteCursor { idx: usize },
-    ListDir,
+    ResizePreview { bigger: bool },
+    ExecuteCursor,
     MoveToParent,
-    GetFileDetails { idx: usize },
-    Pick { idx: usize, pick_type: PickType },
-    ActPicked,
+    GetFileDetails,
+    Pick { pick_type: PickType },
+    Paste,
 }

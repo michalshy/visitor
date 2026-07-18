@@ -3,12 +3,13 @@ use std::path::{PathBuf};
 use std::env::current_dir;
 use anyhow::Result;
 
-use libvisitor::VEntry;
+use libvisitor::{VEntry, list_dir};
 use ratatui::widgets::ListState;
 
 const DEFAULT_PREVIEW: u8 = 40;
 
 pub struct State {
+    // fs
     pub current_dir: PathBuf,
     pub entries: Vec<VEntry>,
     picked: Option<Picked>,
@@ -21,14 +22,19 @@ pub struct State {
 
 impl State {
     pub fn init() -> Result<State> {
-        let path = current_dir()?;
-        let entries = Vec::new();
+        let current_dir = current_dir()?;
+        let entries = list_dir(&current_dir.clone())?;
+        let mut list_state = ListState::default();
+        if !entries.is_empty() {
+            list_state.select_first();
+        }
+
         Ok(State { 
-            current_dir: path, 
+            current_dir, 
             entries, 
             picked: None, 
             indices: VecDeque::new(), 
-            list_state: ListState::default(),
+            list_state,
             preview_size: DEFAULT_PREVIEW
         })
     }
