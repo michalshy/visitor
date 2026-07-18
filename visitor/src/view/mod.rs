@@ -8,7 +8,7 @@ use crate::state::State;
 use anyhow::Result;
 use crossterm::event::KeyCode;
 use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::{Constraint, Layout, Rect}, style::{Color, Modifier, Style, Styled}, widgets::{Block, Borders, List, ListState, Padding, Paragraph, Widget, canvas::Line}};
-use crate::{state::{PickType}, events::callback::Callback};
+use crate::{state::{PickType}};
 use tracing::{info, warn, error, debug};
 
 

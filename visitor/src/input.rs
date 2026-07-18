@@ -1,6 +1,15 @@
 use anyhow::Result;
+use crossterm::event::KeyCode;
 
 use crate::{action::Action, state::State};
+
+pub fn map_key(key: KeyCode) -> Option<Action> {
+    match key {
+        
+    }
+
+    None
+}
 
 pub fn handle_events(state: &mut State) -> Result<()> {
     match event::read()? {

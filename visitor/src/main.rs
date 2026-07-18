@@ -4,7 +4,6 @@ mod view;
 mod action;
 mod update;
 mod input;
-mod events;
 
 use crate::app::App;
 use anyhow::Result;

@@ -1,7 +1,7 @@
 use anyhow::Result;
 use crossterm::event::KeyCode;
 use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::{Constraint, Layout, Rect}, style::{Color, Modifier, Style, Styled}, widgets::{Block, Borders, List, ListState, Padding, Paragraph, Widget, canvas::Line}};
-use crate::{state::{PickType, State}, events::callback::Callback};
+use crate::{state::{PickType, State}};
 use tracing::{info, warn, error, debug};
 use crate::view::pallete;
 use crate::view::convert::{to_list_item, highlighted};
