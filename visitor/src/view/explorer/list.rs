@@ -1,0 +1,23 @@
+use anyhow::Result;
+use crossterm::event::KeyCode;
+use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::{Constraint, Layout, Rect}, style::{Color, Modifier, Style, Styled}, widgets::{Block, Borders, List, ListState, Padding, Paragraph, Widget, canvas::Line}};
+use crate::{state::{PickType, State}, events::callback::Callback};
+use tracing::{info, warn, error, debug};
+use crate::view::pallete;
+use crate::view::convert::{to_list_item, highlighted};
+
+pub fn draw(state: &mut State, frame: &mut Frame, rect: Rect) {
+    let items = state.entries
+        .iter()
+        .enumerate()
+        .map(|(idx, e)| 
+            to_list_item(e, highlighted(idx, state.list_state.selected())));
+
+    let style = Style::default()
+        .bg(pallete::SECONDARY_BG);
+
+    let list = List::new(items)
+        .style(style);
+
+    frame.render_stateful_widget(list, rect, &mut state.list_state);
+}

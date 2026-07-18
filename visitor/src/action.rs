@@ -1,8 +1,6 @@
-use std::path::{PathBuf};
+use crate::state::PickType;
 
-use crate::app::state::PickType;
-
-pub enum Command {
+pub enum Action {
     ListDir,
     MoveToParent,
     GetFileDetails { idx: usize },

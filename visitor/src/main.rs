@@ -1,5 +1,9 @@
 mod app;
-mod tui;
+mod state;
+mod view;
+mod action;
+mod update;
+mod input;
 mod events;
 
 use crate::app::App;

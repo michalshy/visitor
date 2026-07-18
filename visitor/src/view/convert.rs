@@ -1,6 +1,6 @@
 use libvisitor::{VEntry, VKind::{Symlink, File, Dir}};
 use ratatui::{style::{Color, Style}, text::{Line, Span}, widgets::ListItem};
-use crate::tui::pallete;
+use crate::view::pallete;
 use chrono::{DateTime, Local};
 
 pub fn highlighted(idx: usize, selected: Option<usize>) -> bool {
