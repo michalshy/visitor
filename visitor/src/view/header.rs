@@ -1,8 +1,5 @@
-use anyhow::Result;
-use crossterm::event::KeyCode;
 use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::{Constraint, Layout, Rect}, style::{Color, Modifier, Style, Styled}, widgets::{Block, Borders, List, ListState, Padding, Paragraph, Widget, canvas::Line}};
-use crate::{state::{PickType, State}};
-use tracing::{info, warn, error, debug};
+use crate::{state::State};
 use crate::view::pallete;
 
 pub fn draw(state: &State, frame: &mut Frame, rect: Rect) {

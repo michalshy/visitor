@@ -6,6 +6,8 @@ use anyhow::Result;
 use libvisitor::{VEntry, list_dir};
 use ratatui::widgets::ListState;
 
+use crate::state::Mode::Normal;
+
 const DEFAULT_PREVIEW: u8 = 40;
 
 pub struct State {
@@ -18,6 +20,7 @@ pub struct State {
     pub indices: VecDeque<usize>, // saved indices
     pub list_state: ListState, // list of current entries
     pub preview_size: u8, // in percentage
+    pub mode: Mode, // for displaying popups
 }
 
 impl State {
@@ -35,7 +38,8 @@ impl State {
             picked: None, 
             indices: VecDeque::new(), 
             list_state,
-            preview_size: DEFAULT_PREVIEW
+            preview_size: DEFAULT_PREVIEW,
+            mode: Normal
         })
     }
 
@@ -64,4 +68,20 @@ pub enum PickType
 pub struct Picked {
     pub path: PathBuf,
     pub pick_type: PickType,
+}
+
+pub enum NewEntryKind {
+    Dir,
+    Symlink,
+    File
+}
+
+pub enum PopUpState {
+    NewEntry { kind: NewEntryKind, buffer: String }
+}
+
+pub enum Mode
+{
+    Normal,
+    PopUp { state: PopUpState }
 }

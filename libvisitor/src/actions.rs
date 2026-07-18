@@ -25,6 +25,11 @@ pub fn act_delete(path: PathBuf) -> Result<(), VError> {
 }
 
 pub fn act_copy(from: PathBuf, to: PathBuf) -> Result<u64, VError> {
+    // if
+    if to.exists() {
+        return Ok(0)
+    }
+
     match fs::copy(from, to) {
         Ok(size) => {
             Ok(size)
@@ -36,6 +41,16 @@ pub fn act_copy(from: PathBuf, to: PathBuf) -> Result<u64, VError> {
 }
 
 pub fn act_move(from: PathBuf, to: PathBuf) -> Result<(), VError> {
+    // moved by something else
+    if !from.exists() {
+        return Ok(())
+    }
+
+    if to.exists() {
+        return Ok(()) // we currently doesnt support this case
+    }
+
+    // in the same directory
     if let Some(from_p) = from.clone().parent() 
         && let Some(to_p) = to.clone().parent() {
         if from_p == to_p {
@@ -43,6 +58,7 @@ pub fn act_move(from: PathBuf, to: PathBuf) -> Result<(), VError> {
         }
     } 
 
+    // common case
     act_copy(from.clone(), to)?;
     act_delete(from)
 }

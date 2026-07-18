@@ -1,5 +1,5 @@
 use anyhow::{Result};
-use libvisitor::{VKind, act_copy, act_move, list_dir};
+use libvisitor::{VKind, act_copy, act_delete, act_move, list_dir};
 use tracing::info;
 
 use crate::{action::Action, state::{State, PickType}};
@@ -36,6 +36,15 @@ pub fn update(state: &mut State, action: Action) -> Result<()> {
         Action::ResizePreview { bigger } => {
             act_resize(state, bigger);
         },
+        Action::Delete => {
+            if let Some(idx) = state.list_state.selected() {
+                act_delete(state.entries[idx].path.clone())?;
+            }
+            update_entries(state)?
+        }
+        Action::NewEntry => {
+            
+        }
     }
     Ok(())
 }

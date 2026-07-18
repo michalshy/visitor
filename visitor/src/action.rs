@@ -1,6 +1,4 @@
-use crossterm::event::KeyCode;
-
-use crate::state::PickType;
+use crate::state::{PickType};
 
 pub enum Action {
     CursorUp,
@@ -11,4 +9,6 @@ pub enum Action {
     GetFileDetails,
     Pick { pick_type: PickType },
     Paste,
+    Delete,
+    NewEntry,
 }
