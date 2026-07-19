@@ -16,34 +16,32 @@ pub struct App
 {
     state: State,
     _logger: Logger,
-    exit: bool,
 }
 
 impl App {
     pub fn init() -> Result<App> {
         let _logger = Logger::new();
         let state = State::init()?;
-        Ok(App { state, _logger, exit: false })
+        Ok(App { state, _logger })
     }
 
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {
-        while !self.exit {
+        while !self.state.exit {
             terminal.draw(|frame| draw(&mut self.state, frame))?;
             if event::poll(Duration::from_millis(16))? {
                 if let Event::Key(k) = event::read()? {
-                    self.handle_event(k, mode)?;       
+                    self.handle_event(k)?;       
                 }
             }
         }
         Ok(())
     }
 
-    fn handle_event(&mut self, event: KeyEvent, mode: &Mode) -> Result<()> {
+    fn handle_event(&mut self, event: KeyEvent) -> Result<()> {
         if event.kind == KeyEventKind::Press {
             match event.code {
-                KeyCode::Esc => self.exit = true,
                 _ => {
-                    if let Some(action) = input::map_key(event.code, mode) {
+                    if let Some(action) = input::map_key(event.code, &self.state.mode) {
                         update(&mut self.state, action)?;
                     }
                 }

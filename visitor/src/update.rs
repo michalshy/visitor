@@ -2,48 +2,70 @@ use anyhow::{Result};
 use libvisitor::{VKind, act_copy, act_delete, act_move, list_dir};
 use tracing::info;
 
-use crate::{action::Action, state::{State, PickType}};
+use crate::{action::Action, state::{State, PickType, PopUpState, Mode}};
 
 pub fn update(state: &mut State, action: Action) -> Result<()> {
     match action {
         Action::CursorDown => {
             state.list_state.select_next();
-        },
+        }
         Action::CursorUp => {
             state.list_state.select_previous();
-        },
+        }
         Action::ExecuteCursor => {
             if let Some(idx) = state.list_state.selected() {
                 return act_execute(state, idx)
             }
-        },
+        }
         Action::GetFileDetails => {
             // tbd
-        },
+        }
         Action::MoveToParent =>{
             return act_move_parent(state)
-        },
+        }
         Action::Paste => {
             if let Some(idx) = state.list_state.selected() {
                 return act_paste(state)
             }
-        },
+        }
         Action::Pick { pick_type } => {
             if let Some(idx) = state.list_state.selected() {
                 return act_pick(state, idx, pick_type);
             }
-        },
+        }
         Action::ResizePreview { bigger } => {
             act_resize(state, bigger);
-        },
+        }
         Action::Delete => {
             if let Some(idx) = state.list_state.selected() {
                 act_delete(state.entries[idx].path.clone())?;
             }
             update_entries(state)?
         }
-        Action::NewEntry => {
-            
+        Action::StartNewEntry { kind } => {
+            let new_state = PopUpState::NewEntry { kind, buffer: String::new() };
+            state.mode = Mode::PopUp { state: new_state };
+        }
+        Action::Exit => {
+            state.exit = true
+        }
+        Action::PopupCancel => {
+            state.mode = Mode::Normal;
+        }
+        Action::PopupConfirm => {
+            if let Mode::PopUp { state: PopUpState::NewEntry { kind, buffer: _ } } = &mut state.mode {
+                // create based on kind
+            }
+        }
+        Action::PopupRevert => {
+            if let Mode::PopUp { state: PopUpState::NewEntry { kind: _, buffer } } = &mut state.mode {
+                buffer.pop();
+            }
+        }
+        Action::PopupType { c } => {
+            if let Mode::PopUp { state: PopUpState::NewEntry { kind: _, buffer } } = &mut state.mode {
+                buffer.push(c);
+            }
         }
     }
     Ok(())

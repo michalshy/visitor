@@ -11,6 +11,9 @@ use crate::state::Mode::Normal;
 const DEFAULT_PREVIEW: u8 = 40;
 
 pub struct State {
+    // app
+    pub exit: bool,
+
     // fs
     pub current_dir: PathBuf,
     pub entries: Vec<VEntry>,
@@ -33,6 +36,7 @@ impl State {
         }
 
         Ok(State { 
+            exit: false,
             current_dir, 
             entries, 
             picked: None, 

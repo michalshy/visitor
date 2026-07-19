@@ -1,4 +1,4 @@
-use crate::state::{PickType};
+use crate::state::{NewEntryKind, PickType};
 
 pub enum Action {
     CursorUp,
@@ -10,10 +10,11 @@ pub enum Action {
     Pick { pick_type: PickType },
     Paste,
     Delete,
-    NewEntry,
+    StartNewEntry { kind: NewEntryKind },
+    Exit,
 
     PopupType{ c: char },
     PopupRevert,
     PopupConfirm,
-    PopupCancel
+    PopupCancel,
 }

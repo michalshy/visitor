@@ -1,6 +1,7 @@
 use anyhow::Result;
 use crossterm::event::KeyCode;
 use crate::state::Mode::{Normal, PopUp};
+use crate::state::NewEntryKind::{Dir, File, Symlink};
 use crate::state::{Mode, PickType};
 
 use crate::{action::Action};
@@ -14,6 +15,7 @@ pub fn map_key(key: KeyCode, mode: &Mode) -> Option<Action> {
 
 pub fn map_normal(key: KeyCode) -> Option<Action> {
     match key {
+        KeyCode::Esc => Some(Action::Exit),
         KeyCode::Up => Some(Action::CursorUp),
         KeyCode::Down => Some(Action::CursorDown),
         KeyCode::Char('[') => Some(Action::ResizePreview { bigger: true }),
@@ -22,7 +24,9 @@ pub fn map_normal(key: KeyCode) -> Option<Action> {
         KeyCode::Char('x') => Some(Action::Pick { pick_type: PickType::Cut }),
         KeyCode::Char('v') => Some(Action::Paste),
         KeyCode::Char('q') => Some(Action::Delete),
-        KeyCode::Char('s') | KeyCode::Char('d') | KeyCode::Char('f') => Some(Action::NewEntry),
+        KeyCode::Char('s') => Some(Action::StartNewEntry { kind: Symlink }),
+        KeyCode::Char('d') => Some(Action::StartNewEntry { kind: Dir }),
+        KeyCode::Char('f') => Some(Action::StartNewEntry { kind: File }),
         KeyCode::Backspace => Some(Action::MoveToParent),
         KeyCode::Enter => Some(Action::ExecuteCursor),
         _ => None
