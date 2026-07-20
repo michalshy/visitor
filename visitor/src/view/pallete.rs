@@ -1,5 +1,36 @@
 use ratatui::style::Color;
 
+use crate::state::Mode;
+
+// multipliers
+const DIMMED_MULT: f32 = 0.5; // 1.0 = no change, 0.0 = black
+
+pub fn is_dimmed(color: Color, mode: &Mode) -> Color {
+    if mode == &Mode::Normal {
+        return color
+    }
+
+    match color {
+        Color::Rgb(r, g, b) => Color::Rgb(
+            (r as f32 * DIMMED_MULT) as u8,
+            (g as f32 * DIMMED_MULT) as u8,
+            (b as f32 * DIMMED_MULT) as u8,
+        ),
+        other => other,
+    }
+}
+
+pub fn dim(color: Color) -> Color {
+    match color {
+        Color::Rgb(r, g, b) => Color::Rgb(
+            (r as f32 * DIMMED_MULT) as u8,
+            (g as f32 * DIMMED_MULT) as u8,
+            (b as f32 * DIMMED_MULT) as u8,
+        ),
+        other => other,
+    }
+}
+
 // colors
 pub const PRIMARY_BG: Color = Color::Rgb(35, 36, 48);
 pub const SECONDARY_BG: Color = Color::Rgb(26, 27, 35);

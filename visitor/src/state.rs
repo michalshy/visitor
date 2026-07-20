@@ -74,16 +74,19 @@ pub struct Picked {
     pub pick_type: PickType,
 }
 
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
 pub enum NewEntryKind {
     Dir,
     Symlink,
     File
 }
 
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
 pub enum PopUpState {
     NewEntry { kind: NewEntryKind, buffer: String }
 }
 
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
 pub enum Mode
 {
     Normal,
