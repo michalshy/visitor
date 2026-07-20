@@ -12,10 +12,7 @@ pub fn draw(buffer: &str, frame: &mut Frame, area: Rect) {
         .max(title.chars().count()) as u16;
     let width = (content_width + 4).min(area.width);
 
-    // 2 lines of text + top/bottom border
-    let height = 4.min(area.height);
-
-    let area = area.centered(Constraint::Length(width), Constraint::Length(height));
+    let area = area.centered(Constraint::Length(width), Constraint::Length(4));
     frame.render_widget(Clear, area);
 
     let block = Block::default()

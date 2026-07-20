@@ -66,7 +66,7 @@ pub fn update(state: &mut State, action: Action) -> Result<()> {
                         act_create_symlink();
                     }
                 }
-                list_dir(&state.current_dir)?;
+                update_entries(state)?;
                 state.mode = Mode::Normal;
             }
         }

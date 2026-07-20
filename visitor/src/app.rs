@@ -2,13 +2,13 @@ mod logger;
 
 use std::time::Duration;
 
-use crossterm::event::{self, KeyCode, KeyEvent, KeyEventKind, Event};
+use crossterm::event::{self, KeyEvent, KeyEventKind, Event};
 use ratatui::{DefaultTerminal};
 use anyhow::{Ok, Result};
 
 use crate::app::logger::Logger;
 use crate::input;
-use crate::state::{Mode, State};
+use crate::state::State;
 use crate::update::update;
 use crate::view::draw;
 

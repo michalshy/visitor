@@ -19,5 +19,9 @@ pub fn draw(state: &mut State, frame: &mut Frame, rect: Rect) {
     let list = List::new(items)
         .style(style);
 
+    if state.list_state.selected() == None {
+        state.list_state.select_first();
+    }
+
     frame.render_stateful_widget(list, rect, &mut state.list_state);
 }
