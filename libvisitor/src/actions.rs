@@ -4,7 +4,7 @@ use std::fs::{self, File};
 use std::path::PathBuf;
 
 pub fn act_create_file(path: PathBuf) -> Result<File, VError>{
-    match File::open(path) {
+    match File::create_new(path) {
         Err(e) => { return Err(VError::Create { e }) },
         Ok(f) => { return Ok(f) }
     }

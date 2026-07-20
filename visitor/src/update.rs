@@ -1,8 +1,8 @@
 use anyhow::{Result};
-use libvisitor::{VKind, act_copy, act_delete, act_move, list_dir};
+use libvisitor::{VKind, act_copy, act_create_dir, act_create_file, act_create_symlink, act_delete, act_move, list_dir};
 use tracing::info;
 
-use crate::{action::Action, state::{State, PickType, PopUpState, Mode}};
+use crate::{action::Action, state::{Mode, NewEntryKind::{Dir, File, Symlink}, PickType, PopUpState, State}};
 
 pub fn update(state: &mut State, action: Action) -> Result<()> {
     match action {
@@ -53,8 +53,21 @@ pub fn update(state: &mut State, action: Action) -> Result<()> {
             state.mode = Mode::Normal;
         }
         Action::PopupConfirm => {
-            if let Mode::PopUp { state: PopUpState::NewEntry { kind, buffer: _ } } = &mut state.mode {
-                // create based on kind
+            if let Mode::PopUp { state: PopUpState::NewEntry { kind, buffer } } = &mut state.mode {
+                let new = state.current_dir.join(buffer);
+                match kind {
+                    Dir => {
+                        act_create_dir(new)?;
+                    }
+                    File => {
+                        act_create_file(new)?;
+                    }   
+                    Symlink => {
+                        act_create_symlink();
+                    }
+                }
+                list_dir(&state.current_dir)?;
+                state.mode = Mode::Normal;
             }
         }
         Action::PopupRevert => {
