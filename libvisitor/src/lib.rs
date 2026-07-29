@@ -14,6 +14,6 @@ pub use actions::act_create_dir;
 pub use actions::act_create_file;
 pub use actions::act_create_symlink;
 pub use actions::act_move;
-pub use actions::act_delete;
+pub use actions::act_delete_file;
 pub use actions::act_extract;
 pub use actions::act_rename;

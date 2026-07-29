@@ -17,8 +17,15 @@ pub fn act_create_dir(path: PathBuf) -> Result<(), VError> {
     }
 }
 
-pub fn act_delete(path: PathBuf) -> Result<(), VError> {
+pub fn act_delete_file(path: PathBuf) -> Result<(), VError> {
     match fs::remove_file(path) {
+        Err(e) => { return Err(VError::Delete { e }) },
+        _ => Ok(())
+    }
+}
+
+pub fn act_delete_dir(path: PathBuf, recursive: bool) -> Result<(), VError> {
+    match fs::remove_dir(path) {
         Err(e) => { return Err(VError::Delete { e }) },
         _ => Ok(())
     }
@@ -60,7 +67,7 @@ pub fn act_move(from: PathBuf, to: PathBuf) -> Result<(), VError> {
 
     // common case
     act_copy(from.clone(), to)?;
-    act_delete(from)
+    act_delete_file(from)
 }
 
 pub fn act_rename(from: PathBuf, to: PathBuf) -> Result<(), VError>  {

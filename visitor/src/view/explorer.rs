@@ -1,6 +1,5 @@
 mod preview;
 mod list;
-
 use ratatui::{Frame, layout::{Constraint, Layout, Rect}};
 use crate::{state::State};
 

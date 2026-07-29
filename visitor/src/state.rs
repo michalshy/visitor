@@ -24,6 +24,7 @@ pub struct State {
     pub list_state: ListState, // list of current entries
     pub preview_size: u8, // in percentage
     pub mode: Mode, // for displaying popups
+    pub preview: Preview, // for previews
 }
 
 impl State {
@@ -43,7 +44,8 @@ impl State {
             indices: VecDeque::new(), 
             list_state,
             preview_size: DEFAULT_PREVIEW,
-            mode: Normal
+            mode: Normal,
+            preview: Preview::Empty,
         })
     }
 
@@ -74,21 +76,28 @@ pub struct Picked {
     pub pick_type: PickType,
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub enum NewEntryKind {
     Dir,
     Symlink,
     File
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub enum PopUpState {
     NewEntry { kind: NewEntryKind, buffer: String }
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub enum Mode
 {
     Normal,
     PopUp { state: PopUpState }
+}
+
+pub enum Preview
+{
+    Dir(Vec<VEntry>),
+    Text(String),
+    Empty
 }
