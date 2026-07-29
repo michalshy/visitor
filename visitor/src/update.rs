@@ -46,10 +46,14 @@ pub fn update(state: &mut State, action: Action) -> Result<()> {
 
     match action {
         Action::CursorDown => {
-            state.list_state.select_next();
+            if let Some(idx) = state.list_state.selected() && idx < state.entries.len() - 1 {
+                state.list_state.select_next();
+            }
         }
         Action::CursorUp => {
-            state.list_state.select_previous();
+            if let Some(idx) = state.list_state.selected() && idx > 0 {
+                state.list_state.select_previous();
+            }
         }
         Action::ExecuteCursor => {
             if let Some(idx) = state.list_state.selected() {
@@ -122,7 +126,9 @@ pub fn update(state: &mut State, action: Action) -> Result<()> {
     }
 
     if idx != state.list_state.selected() || dir != state.current_dir {
-        update_preview(state);
+        if let Err(err) = update_preview(state) {
+            warn!(?err, "Could not update preview");
+        }
     }
 
     Ok(())
@@ -144,7 +150,9 @@ fn act_move_parent(state: &mut State) -> Result<()> {
             Some(_) => {
                 state.list_state.select(idx);
             }
-            _ => ()
+            _ => {
+                state.list_state.select_last();
+            }
         }
     }
     Ok(())

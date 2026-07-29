@@ -45,5 +45,10 @@ fn dir_prev(entries: &Vec<VEntry>, mode: Mode, frame: &mut Frame, rect: Rect) {
 }
 
 fn text_prev(lines: &String, mode: Mode, frame: &mut Frame, rect: Rect) {
-
+    let style = Style::default()
+        .bg(is_dimmed(pallete::SECONDARY_BG, &mode))
+        .fg(is_dimmed(pallete::PRIMARY_TXT, &mode));
+        
+    let paragraph = Paragraph::new(lines.clone()).style(style);
+    frame.render_widget(paragraph, rect);
 }
